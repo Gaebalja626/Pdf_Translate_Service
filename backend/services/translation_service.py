@@ -1,6 +1,6 @@
 import re
 import torch
-from transformers import MarianMTModel, MarianTokenizer
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from typing import List, Union
 import sys
 import os
@@ -9,13 +9,13 @@ from config import TRANSLATION_MODEL, TRANSLATION_DEVICE, TRANSLATION_BATCH_SIZE
 
 
 class TranslationService:
-    """Translation service using MarianMT for English to Korean translation"""
+    """Translation service using NLLB for English to Korean translation"""
     
     def __init__(self):
-        """Initialize MarianMT model"""
+        """Initialize NLLB model"""
         print(f"Loading translation model: {TRANSLATION_MODEL}")
-        self.tokenizer = MarianTokenizer.from_pretrained(TRANSLATION_MODEL)
-        self.model = MarianMTModel.from_pretrained(TRANSLATION_MODEL)
+        self.tokenizer = AutoTokenizer.from_pretrained(TRANSLATION_MODEL)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(TRANSLATION_MODEL)
         
         # Move to GPU if available
         if torch.cuda.is_available() and TRANSLATION_DEVICE == "cuda":
@@ -80,16 +80,20 @@ class TranslationService:
         if not texts:
             return []
         
-        # Tokenize
+        # Tokenize with source language
         inputs = self.tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=512)
         
         # Move to device
         if torch.cuda.is_available() and TRANSLATION_DEVICE == "cuda":
             inputs = {k: v.to(TRANSLATION_DEVICE) for k, v in inputs.items()}
         
-        # Generate translation
+        # Generate translation with target language code for Korean
         with torch.no_grad():
-            translated = self.model.generate(**inputs, max_length=512)
+            translated = self.model.generate(
+                **inputs,
+                forced_bos_token_id=self.tokenizer.lang_code_to_id.get("kor_Hang", self.tokenizer.lang_code_to_id["kor_Hang"]),
+                max_length=512
+            )
         
         # Decode
         translated_texts = self.tokenizer.batch_decode(translated, skip_special_tokens=True)

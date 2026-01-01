@@ -20,9 +20,9 @@ DEVICE_FORMULA = "gpu"
 DPI = 144  # Resolution for PDF to image conversion
 
 # Translation settings
-TRANSLATION_MODEL = "Helsinki-NLP/opus-mt-en-ko"  # MarianMT English to Korean
+TRANSLATION_MODEL = "facebook/nllb-200-distilled-600M"  # NLLB English to Korean
 TRANSLATION_DEVICE = "cuda"  # Use GPU for translation
-TRANSLATION_BATCH_SIZE = 8
+TRANSLATION_BATCH_SIZE = 4  # Reduced for NLLB
 
 # File upload settings
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50MB
