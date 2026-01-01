@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Translation Service - PDF 번역</title>
+    <meta name="description" content="AI 기반 OCR과 번역으로 영어 PDF를 한국어로 자동 변환">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background gradient -->
+    <div class="bg-gradient"></div>
+    
+    <!-- Main container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="10" fill="url(#gradient)"/>
+                    <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1>OCR Translation</h1>
+            </div>
+            <p class="tagline">AI 기반 문서 번역 서비스</p>
+        </header>
+
+        <!-- Hero section -->
+        <section class="hero">
+            <h2 class="hero-title">영어 PDF를 한국어로 <span class="gradient-text">자동 번역</span></h2>
+            <p class="hero-description">
+                PaddleOCR과 MarianMT를 활용한 고품질 문서 번역<br>
+                수식과 레이아웃을 보존하며 정확하게 번역합니다
+            </p>
+        </section>
+
+        <!-- Upload section -->
+        <section class="upload-section">
+            <div class="upload-card glass" id="uploadCard">
+                <div class="upload-zone" id="uploadZone">
+                    <svg class="upload-icon" width="64" height="64" viewBox="0 0 24 24" fill="none">
+                        <path d="M7 18C4.23858 18 2 15.7614 2 13C2 10.2386 4.23858 8 7 8C7.36064 8 7.71474 8.03129 8.05895 8.09145C8.02137 7.73551 8 7.37052 8 7C8 4.23858 10.2386 2 13 2C15.419 2 17.4367 3.71776 17.9 6.00003C20.1421 6.00003 22 7.85786 22 10C22 12.1421 20.1421 14 18 14H16M12 21V11M12 11L9 14M12 11L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h3>PDF 파일을 드래그하거나 클릭하세요</h3>
+                    <p>최대 50MB까지 업로드 가능</p>
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                    <button class="btn-primary" id="selectBtn">파일 선택</button>
+                </div>
+
+                <!-- File info (hidden initially) -->
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <div class="file-details">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 18H17V16H7V18ZM7 14H17V12H7V14ZM14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z" fill="currentColor"/>
+                        </svg>
+                        <div>
+                            <h4 id="fileName">document.pdf</h4>
+                            <p id="fileSize">0 MB</p>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="changeFileBtn">파일 변경</button>
+                </div>
+
+                <!-- Progress section (hidden initially) -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-info">
+                        <span id="progressText">업로드 중...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-message" id="progressMessage">파일을 서버에 업로드하는 중입니다...</p>
+                </div>
+
+                <!-- Result section (hidden initially) -->
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <div class="success-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>번역 완료!</h3>
+                    <p>번역된 PDF를 다운로드할 수 있습니다</p>
+                    <div class="result-actions">
+                        <button class="btn-primary" id="downloadBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 3V16M12 16L7 11M12 16L17 11M3 21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            다운로드
+                        </button>
+                        <button class="btn-secondary" id="newFileBtn">새 파일 번역</button>
+                    </div>
+                </div>
+
+                <!-- Error section (hidden initially) -->
+                <div class="error-section" id="errorSection" style="display: none;">
+                    <div class="error-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>오류 발생</h3>
+                    <p id="errorMessage">파일 처리 중 오류가 발생했습니다</p>
+                    <button class="btn-secondary" id="retryBtn">다시 시도</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features">
+            <div class="feature-card glass">
+                <div class="feature-icon">🔍</div>
+                <h3>고정밀 OCR</h3>
+                <p>PaddleOCR v5로 텍스트와 수식을 정확하게 인식</p>
+            </div>
+            <div class="feature-card glass">
+                <div class="feature-icon">🌐</div>
+                <h3>자연스러운 번역</h3>
+                <p>MarianMT 모델로 문맥을 고려한 번역</p>
+            </div>
+            <div class="feature-card glass">
+                <div class="feature-icon">📐</div>
+                <h3>레이아웃 보존</h3>
+                <p>원본 문서의 구조와 수식을 그대로 유지</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by PaddleOCR, MarianMT & FastAPI</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
